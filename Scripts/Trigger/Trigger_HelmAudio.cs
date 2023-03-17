@@ -6,6 +6,7 @@ namespace ON.synth
 {
     public class Trigger_HelmAudio : Trigger
     {
+
         public float low;
         public float high;
         public float pitchLow;
@@ -20,15 +21,17 @@ namespace ON.synth
 
         void Start()
         {
-            
+
         }
 
-        void OnEnable(){
+        void OnEnable()
+        {
             helm.NoteOn += NoteOn;
             helm.NoteOff += NoteOff;
         }
 
-        void OnDisable(){
+        void OnDisable()
+        {
             helm.NoteOn -= NoteOn;
             helm.NoteOff -= NoteOff;
 
@@ -36,25 +39,30 @@ namespace ON.synth
 
         void Update()
         {
-            if(ison){
+            if (ison)
+            {
                 noteValue = 1;
             }
-            else{
-                noteValue -= Time.deltaTime * ((decayRate<=0)?1:(1/decayRate));
+            else
+            {
+                noteValue -= Time.deltaTime * ((decayRate <= 0) ? 1 : (1 / decayRate));
             }
-            value = ON.Utils.map(noteValue,0,1,low,high);
-            value = Mathf.Clamp(value,low,high);
+            value = ON.synth.Synth_Util.map(noteValue, 0, 1, low, high);
+            value = Mathf.Clamp(value, low, high);
         }
 
-        public void NoteOn(){
+        public void NoteOn()
+        {
             ison = true;
         }
 
-        public void NoteOff(){
+        public void NoteOff()
+        {
             ison = false;
         }
 
-        public override float GetValue(){
+        public override float GetValue()
+        {
             return value;
         }
     }

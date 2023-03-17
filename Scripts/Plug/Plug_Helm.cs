@@ -1,16 +1,21 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+#if AudioHelm
 using AudioHelm;
+#endif
 using System;
 using UnityEngine.Events;
 
 namespace ON.synth
 {
+
     public class Plug_Helm : MonoBehaviour
     {
         // public AudioSource audio;
+#if AudioHelm
         public HelmController controller;
+#endif
         public Oscillator volumeOscillator;
         public Oscillator pitchOscillator;
         public Oscillator panOscillator;
@@ -63,11 +68,13 @@ namespace ON.synth
 
         IEnumerator PlayNote(int note, int delay)
         {
+#if AudioHelm
             NoteOn?.Invoke();
             controller.NoteOn((int)pitch);
             yield return new WaitForSeconds(delay);
             NoteOff?.Invoke();
             controller.NoteOff(note);
+#endif
             yield return null;
         }
 
@@ -129,5 +136,6 @@ namespace ON.synth
             //     }
             // }
         }
+
     }
 }
