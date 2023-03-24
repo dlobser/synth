@@ -8,6 +8,8 @@ namespace ON.synth
     public class Oscillator_LFO : Oscillator
     {
         public string info;
+        public AnimationCurve aCurve;
+        public float aCurveRange = 1;
         public bool active;
         public bool resetAllCounters;
 
@@ -57,6 +59,12 @@ namespace ON.synth
                 conductor = FindObjectOfType<Conductor>();
             }
             sampleRate = AudioSettings.outputSampleRate;
+
+            for (int i = 0; i < 60; i++)
+            {
+                float v = ((float)i / 60f);
+                aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+            }
         }
 
         void OnDisable()
@@ -66,79 +74,14 @@ namespace ON.synth
 
         void GetValues()
         {
-
-            if (oscillators.multiplyOscillate != null)
-            {
-                multiply = oscillators.multiplyOscillate.GetValue();
-                if (triggers.multiplyTrigger != null)
-                    multiply *= triggers.multiplyTrigger.GetValue();
-            }
-            else if (triggers.multiplyTrigger != null)
-                multiply = triggers.multiplyTrigger.GetValue();
-
-            if (oscillators.speedOscillate != null)
-            {
-                speed = oscillators.speedOscillate.GetValue();
-                if (triggers.speedTrigger != null)
-                    speed *= triggers.speedTrigger.GetValue();
-            }
-            else if (triggers.speedTrigger != null)
-                speed = triggers.speedTrigger.GetValue();
-
-            if (oscillators.offsetOscillate != null)
-            {
-                offset = oscillators.offsetOscillate.GetValue();
-                if (triggers.offsetTrigger != null)
-                    offset *= triggers.speedTrigger.GetValue();
-            }
-            else if (triggers.offsetTrigger != null)
-                offset = triggers.offsetTrigger.GetValue();
-
-            if (oscillators.troughOscillate != null)
-            {
-                trough = oscillators.troughOscillate.GetValue();
-                if (triggers.troughTrigger != null)
-                    trough *= triggers.troughTrigger.GetValue();
-            }
-            else if (triggers.troughTrigger != null)
-                trough = triggers.troughTrigger.GetValue();
-
-            if (oscillators.crestOscillate != null)
-            {
-                crest = oscillators.crestOscillate.GetValue();
-                if (triggers.crestTrigger != null)
-                    crest *= triggers.crestTrigger.GetValue();
-            }
-            else if (triggers.crestTrigger != null)
-                crest = triggers.crestTrigger.GetValue();
-
-            if (oscillators.clampLowOscillate != null)
-            {
-                clampLow = oscillators.clampLowOscillate.GetValue();
-                if (triggers.clampLowTrigger != null)
-                    clampLow *= triggers.clampLowTrigger.GetValue();
-            }
-            else if (triggers.clampLowTrigger != null)
-                clampLow = triggers.clampLowTrigger.GetValue();
-
-            if (oscillators.clampHighOscillate != null)
-            {
-                clampHigh = oscillators.clampHighOscillate.GetValue();
-                if (triggers.clampHighTrigger != null)
-                    clampHigh *= triggers.clampHighTrigger.GetValue();
-            }
-            else if (triggers.clampHighTrigger != null)
-                clampHigh = triggers.clampHighTrigger.GetValue();
-
-            if (oscillators.timeOffsetOscillate != null)
-            {
-                timeOffset = oscillators.timeOffsetOscillate.GetValue();
-                if (triggers.timeOffsetTrigger != null)
-                    timeOffset *= triggers.timeOffsetTrigger.GetValue();
-            }
-            else if (triggers.timeOffsetTrigger != null)
-                timeOffset = triggers.crestTrigger.GetValue();
-
+            multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
+            speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
+            offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
+            trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
+            crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
+            clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
+            clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
+            timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
         }
 
         void OnAudioFilterRead(float[] data, int channels)
@@ -151,7 +94,8 @@ namespace ON.synth
 
         void Update()
         {
-
+            //counting happens in onaudiofilteread for more accuracy if an audiosource is connected.
+            //The audiosource doesn't need to be playing audio
             if (GetComponent<AudioSource>() == null)
             {
                 float masterSpeed = conductor != null ? conductor.masterSpeed : 1;
@@ -170,17 +114,23 @@ namespace ON.synth
                 resetAllCounters = false;
             }
 
-
             if (line != null)
             {
                 line.positionCount = lineLength;
                 Vector3[] l = new Vector3[lineLength];
+
                 for (int i = 0; i < l.Length; i++)
                 {
                     float c = ((float)i / 60f);// * (speed != 0 ? (1 / speed) : 0);
                     l[i] = new Vector3((float)i / 60, GetValue(c), 0);
                 }
                 line.SetPositions(l);
+            }
+
+            for (int i = 0; i < 60; i++)
+            {
+                float v = ((float)i / 60f);
+                aCurve.MoveKey(i, new Keyframe(v, GetValue(v * aCurveRange)));
             }
 
             info = "Counter: " + counter + ", " + "Value: " + GetValue();
@@ -250,11 +200,7 @@ namespace ON.synth
                 print("Output: " + output);
             }
             output = Mathf.Pow(output, output > 0 ? sinPower : 1);
-            // if(quantize>0){
-            //     output *= quantize;
-            //     output = Mathf.Floor(output);
-            //     output /= quantize;
-            // }
+
             lazyValue = Mathf.Lerp(lazyValue, output, lazyLerpSpeed * Time.deltaTime);
             return lazyValue;
         }
@@ -277,77 +223,14 @@ namespace ON.synth
 
             float t = c;
 
-            if (oscillators.multiplyOscillate != null)
-            {
-                _multiply = oscillators.multiplyOscillate.GetValue(t);
-                if (triggers.multiplyTrigger != null)
-                    _multiply *= triggers.multiplyTrigger.GetValue();
-            }
-            else if (triggers.multiplyTrigger != null)
-                _multiply = triggers.multiplyTrigger.GetValue();
-
-            if (oscillators.speedOscillate != null)
-            {
-                _speed = oscillators.speedOscillate.GetValue(t);
-                if (triggers.speedTrigger != null)
-                    _speed *= triggers.speedTrigger.GetValue();
-            }
-            else if (triggers.speedTrigger != null)
-                _speed = triggers.speedTrigger.GetValue();
-
-            if (oscillators.offsetOscillate != null)
-            {
-                _offset = oscillators.offsetOscillate.GetValue(t);
-                if (triggers.offsetTrigger != null)
-                    _offset *= triggers.speedTrigger.GetValue();
-            }
-            else if (triggers.offsetTrigger != null)
-                _offset = triggers.offsetTrigger.GetValue();
-
-            if (oscillators.troughOscillate != null)
-            {
-                _trough = oscillators.troughOscillate.GetValue(t);
-                if (triggers.troughTrigger != null)
-                    _trough *= triggers.troughTrigger.GetValue();
-            }
-            else if (triggers.troughTrigger != null)
-                _trough = triggers.troughTrigger.GetValue();
-
-            if (oscillators.crestOscillate != null)
-            {
-                crest = oscillators.crestOscillate.GetValue(t);
-                if (triggers.crestTrigger != null)
-                    _crest *= triggers.crestTrigger.GetValue();
-            }
-            else if (triggers.crestTrigger != null)
-                _crest = triggers.crestTrigger.GetValue();
-
-            if (oscillators.clampLowOscillate != null)
-            {
-                _clampLow = oscillators.clampLowOscillate.GetValue(t);
-                if (triggers.clampLowTrigger != null)
-                    _clampLow *= triggers.clampLowTrigger.GetValue();
-            }
-            else if (triggers.clampLowTrigger != null)
-                _clampLow = triggers.clampLowTrigger.GetValue();
-
-            if (oscillators.clampHighOscillate != null)
-            {
-                _clampHigh = oscillators.clampHighOscillate.GetValue(t);
-                if (triggers.clampHighTrigger != null)
-                    _clampHigh *= triggers.clampHighTrigger.GetValue();
-            }
-            else if (triggers.clampHighTrigger != null)
-                _clampHigh = triggers.clampHighTrigger.GetValue();
-
-            if (oscillators.timeOffsetOscillate != null)
-            {
-                _timeOffset = oscillators.timeOffsetOscillate.GetValue(t);
-                if (triggers.timeOffsetTrigger != null)
-                    _timeOffset *= triggers.timeOffsetTrigger.GetValue();
-            }
-            else if (triggers.timeOffsetTrigger != null)
-                _timeOffset = triggers.crestTrigger.GetValue();
+            multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
+            speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
+            offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
+            trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
+            crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
+            clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
+            clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
+            timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
 
             float s;
 
@@ -370,11 +253,6 @@ namespace ON.synth
                 lBound = 0;
             float output = Mathf.Clamp(map(s, lBound, 1, _trough, _crest) * _multiply + _offset, _clampLow, _clampHigh);
             output = Mathf.Pow(output, output > 0 ? sinPower : 1);
-            // if(quantize>0){
-            //     output *= quantize;
-            //     output = Mathf.Floor(output);
-            //     output /= quantize;
-            // }
             return output;
         }
     }
