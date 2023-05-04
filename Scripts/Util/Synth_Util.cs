@@ -17,9 +17,9 @@ namespace ON.synth
             return value;
         }
 
-        public static float GetOscTrigValue(Oscillator oscillator, Trigger trigger)
+        public static float GetOscTrigValue(Oscillator oscillator, Trigger trigger, float val = 1)
         {
-            float value = 1;
+            float value = val;
             if (oscillator != null)
             {
                 value = oscillator.GetValue();
@@ -30,7 +30,6 @@ namespace ON.synth
                 value = trigger.GetValue();
             return value;
         }
-
         public static float map(float s, float a1, float a2, float b1, float b2)
         {
             return b1 + (s - a1) * (b2 - b1) / (a2 - a1);

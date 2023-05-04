@@ -46,7 +46,8 @@ namespace ON.synth
                 if (currentUpdateTime >= updateStep)
                 {
                     currentUpdateTime = 0f;
-                    audioSource.clip.GetData(clipSampleData, audioSource.timeSamples); //I read 1024 samples, which is about 80 ms on a 44khz stereo clip, beginning at the current sample position of the clip.
+                    if (audioSource.clip != null)
+                        audioSource.clip.GetData(clipSampleData, audioSource.timeSamples); //I read 1024 samples, which is about 80 ms on a 44khz stereo clip, beginning at the current sample position of the clip.
                     clipLoudness = 0f;
                     foreach (var sample in clipSampleData)
                     {

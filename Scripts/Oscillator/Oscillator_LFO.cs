@@ -56,7 +56,22 @@ namespace ON.synth
 
             if (conductor == null)
             {
-                conductor = FindObjectOfType<Conductor>();
+                Conductor[] conductors = FindObjectsOfType<Conductor>();
+                Transform parentTransform = this.transform;
+                while (parentTransform != null) // continue as long as there are parents
+                {
+                    for (int i = 0; i < conductors.Length; i++)
+                    {
+                        if (parentTransform.gameObject == conductors[i].gameObject)
+                        {
+                            conductor = conductors[i];
+                            // target GameObject is in the parent hierarchy
+                            Debug.Log(this.gameObject.name + " Found Conductor: " + conductors[i].gameObject.name);
+                            break;
+                        }
+                    }
+                    parentTransform = parentTransform.parent; // move to the next parent
+                }
             }
             sampleRate = AudioSettings.outputSampleRate;
 
@@ -125,6 +140,26 @@ namespace ON.synth
                     l[i] = new Vector3((float)i / 60, GetValue(c), 0);
                 }
                 line.SetPositions(l);
+            }
+            if (aCurve == null)
+            {
+                aCurve = new AnimationCurve();
+            }
+            if (aCurve.keys == null)
+            {
+                for (int i = 0; i < 60; i++)
+                {
+                    float v = ((float)i / 60f);
+                    aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+                }
+            }
+            if (aCurve.keys.Length < 60)
+            {
+                for (int i = 0; i < 60; i++)
+                {
+                    float v = ((float)i / 60f);
+                    aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+                }
             }
 
             for (int i = 0; i < 60; i++)

@@ -31,6 +31,9 @@ namespace ON.synth
         float prevPlaySpeed;
         float playTime;
         GameObject sampleParent;
+        public bool playRandom;
+        int chooseAudio;
+
         Coroutine player;
 
         [Tooltip("Choose audio clips from audio sources in children")]
@@ -44,17 +47,20 @@ namespace ON.synth
 
         void Start()
         {
-            if(sampleParent!=null){
+            if (sampleParent != null)
+            {
                 Destroy(sampleParent);
             }
-            if(this.transform.Find("SampleParent")!=null){
+            if (this.transform.Find("SampleParent") != null)
+            {
                 Destroy(this.transform.Find("SampleParent").gameObject);
             }
             sources = new List<AudioSource>();
-            if(conductor==null){
+            if (conductor == null)
+            {
                 conductor = FindObjectOfType<Conductor>();
             }
-            playTime = (float) AudioSettings.dspTime;
+            playTime = (float)AudioSettings.dspTime;
             initialAudioVolumes = new float[audioSources.Length];
             for (int i = 0; i < audioSources.Length; i++)
             {
@@ -72,7 +78,8 @@ namespace ON.synth
             }
         }
 
-        public void ResetCounter(){
+        public void ResetCounter()
+        {
             frequencyChanged = true;
         }
 
@@ -81,124 +88,164 @@ namespace ON.synth
             float conductorVolume = 1;
             float conductorSpeed = 1;
 
-            if(conductor!=null){
+            if (conductor != null)
+            {
                 conductorVolume = conductor.masterVolume;
                 conductorSpeed = conductor.masterSpeed;
             }
-            if(conductorSpeed==0){
+            if (conductorSpeed == 0)
+            {
                 conductorSpeed = 1;
             }
 
-            if(resetAllCounters){
+            if (resetAllCounters)
+            {
                 resetAllCounters = false;
                 ResetAllCounters();
             }
 
-            if(AudioSettings.dspTime > playTime){
+            if (AudioSettings.dspTime > playTime)
+            {
 
 
-                if (clipParent != null)
+
+                if (!instantiateSource)
                 {
-                    GetComponent<AudioSource>().clip = clipParent.transform.GetChild(Random.Range(0, clipParent.transform.childCount)).GetComponent<AudioSource>().clip;
-                }
-                if(!instantiateSource){
-
-                    if(crop){
+                    if (clipParent != null)
+                    {
+                        int index = !playRandom ? chooseAudio : Random.Range(0, clipParent.transform.childCount);
+                        GetComponent<AudioSource>().clip = clipParent.transform.GetChild(index).GetComponent<AudioSource>().clip;
+                        chooseAudio++;
+                        if (chooseAudio > clipParent.transform.childCount - 1)
+                        {
+                            chooseAudio = 0;
+                        }
+                    }
+                    if (crop)
+                    {
                         GetComponent<AudioSource>().time = inTime;
                     }
                     // audio.Stop();
-                    if(frequencyChanged){
+                    if (frequencyChanged)
+                    {
                         print("Adjust: " + playTime + " , " + Mathf.Ceil((float)playTime));
                         playTime = Mathf.Ceil((float)playTime) + offset;
                         frequencyChanged = false;
-                        
+
                     }
-                    if(Synth_Util.GetOscTrigValue(oscillator,trigger)>=0){
-                        if(audioSources.Length>0){
-                            audioSources[whichAudio].PlayScheduled(playTime + (frequency/conductorSpeed));
-                            audioSources[whichAudio].volume = initialAudioVolumes[whichAudio]*conductorVolume;
+                    if (Synth_Util.GetOscTrigValue(oscillator, trigger) >= 0)
+                    {
+                        if (audioSources.Length > 0)
+                        {
+                            audioSources[whichAudio].PlayScheduled(playTime + (frequency / conductorSpeed));
+                            audioSources[whichAudio].volume = initialAudioVolumes[whichAudio] * conductorVolume;
                             whichAudio++;
-                            if( whichAudio >= audioSources.Length )
+                            if (whichAudio >= audioSources.Length)
                                 whichAudio = 0;
                         }
                         else
-                            GetComponent<AudioSource>().PlayScheduled(playTime + (frequency/conductorSpeed));
+                            GetComponent<AudioSource>().PlayScheduled(playTime + (frequency / conductorSpeed));
                     }
                     // print(AudioSettings.dspTime + " , " + playTime + " , " + (playTime+(frequency/conductorSpeed)));
-                    playTime += (frequency/conductorSpeed);
+                    playTime += (frequency / conductorSpeed);
 
-                    
+
                 }
-                else{
+                else
+                {
                     float initialVolume = 1;
                     GameObject g;
-                     if(audioInstance!=null)
+                    if (audioInstance != null)
                         g = Instantiate(audioInstance);
-                    else if(audioSources.Length>0){
+                    else if (audioSources.Length > 0)
+                    {
                         g = Instantiate(audioSources[whichAudio].gameObject);
                         initialVolume = initialAudioVolumes[whichAudio];
                         whichAudio++;
-                        if( whichAudio >= audioSources.Length )
+                        if (whichAudio >= audioSources.Length)
                             whichAudio = 0;
                     }
-                    else{
+                    else
+                    {
                         g = new GameObject(this.name + "_Note");
                         g.AddComponent<AudioSource>();
                     }
-                    
+
+
                     AudioSource a = g.GetComponent<AudioSource>();
+                    if (a.clip == null)
+                    {
+                        if (clipParent != null)
+                        {
+                            int index = !playRandom ? chooseAudio : Random.Range(0, clipParent.transform.childCount);
+                            if (clipParent.transform.GetChild(index).GetComponent<AudioSource>().clip != null)
+                                a.clip = clipParent.transform.GetChild(index).GetComponent<AudioSource>().clip;
+                            chooseAudio++;
+                            if (chooseAudio > clipParent.transform.childCount - 1)
+                            {
+                                chooseAudio = 0;
+                            }
+                            print(chooseAudio);
+                        }
+                    }
                     // a.clip = GetComponent<AudioSource>().clip;
-                    
-                    if(crop){
+
+                    if (crop)
+                    {
                         a.time = inTime;
                     }
-                    
-                    if(frequencyChanged){
+
+                    if (frequencyChanged)
+                    {
                         print("Adjust: " + playTime + " , " + Mathf.Ceil((float)playTime));
                         playTime = Mathf.Ceil((float)playTime) + offset;
                         frequencyChanged = false;
-                       
+
                     }
 
-                    if(Synth_Util.GetOscTrigValue(oscillator,trigger)>=0){
-                        if(Synth_Util.GetOscTrigValue(oscillator,trigger)>=0){
-                            a.PlayScheduled(playTime + (frequency/conductorSpeed));
-                            a.volume = initialVolume*conductorVolume;
-                        }
+
+                    if (Synth_Util.GetOscTrigValue(oscillator, trigger) >= 0)
+                    {
+                        // if (Synth_Util.GetOscTrigValue(oscillator, trigger) >= 0)
+                        // {
+                        a.PlayScheduled(playTime + (frequency / conductorSpeed));
+                        a.volume = initialVolume * conductorVolume;
+                        // }
                     }
 
-                    playTime += (frequency/conductorSpeed);
+                    playTime += (frequency / conductorSpeed);
                     // a.PlayScheduled(playTime + frequency);
 
                     sources.Add(a);
-                    if(sampleParent==null){
+                    if (sampleParent == null)
+                    {
                         sampleParent = new GameObject("SampleParent");
                         sampleParent.transform.parent = this.transform;
                     }
                     g.transform.parent = sampleParent.transform;
                 }
-                
+
             }
 
 
 
 
             // if(playOscillator){
-                // if(player==null){
-                //     player = StartCoroutine(PlayOscillate());
-                // }
-                if(prevPlaySpeed!=frequency)
-                    frequencyChanged = true;
-                
-                prevPlaySpeed = frequency;
-                // print(player==null);
+            // if(player==null){
+            //     player = StartCoroutine(PlayOscillate());
+            // }
+            if (prevPlaySpeed != frequency)
+                frequencyChanged = true;
+
+            prevPlaySpeed = frequency;
+            // print(player==null);
             //     playSpeed = playOscillator.GetValue();
             // }
             // else if(player!=null){
             //     StopCoroutine(player);
             //     player = null;
             // }
-           
+
             // if (playOscillator || playTrigger)
             // {
             //     float p = 0;
@@ -238,7 +285,7 @@ namespace ON.synth
             //                 g = new GameObject(this.name + "_Note");
             //                 g.AddComponent<AudioSource>();
             //             }
-                        
+
             //             AudioSource a = g.GetComponent<AudioSource>();
             //             a.clip = audio.clip;
             //             if (volumeOscillator)
@@ -252,7 +299,7 @@ namespace ON.synth
             //             if(crop){
             //                 a.time = inTime;
             //             }
-                        
+
             //             a.Play();
             //             sources.Add(a);
             //             if(sampleParent==null){
@@ -272,10 +319,12 @@ namespace ON.synth
             // }
             for (int i = 0; i < sources.Count; i++)
             {
-                if(crop&&sources[i].isPlaying&&sources[i].time>outTime){
+                if (crop && sources[i].isPlaying && sources[i].time > outTime)
+                {
                     sources[i].Stop();
                 }
-                if(!sources[i].isPlaying){
+                if (!sources[i].isPlaying)
+                {
                     Destroy(sources[i].gameObject);
                     sources.RemoveAt(i);
                 }

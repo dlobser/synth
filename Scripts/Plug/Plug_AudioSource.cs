@@ -14,7 +14,7 @@ namespace ON.synth
         public Trigger pitchTrigger;
         public Trigger panTrigger;
         public bool forceAudioToPlay = true;
- 
+
         [Header("Play Single Sample")]
 
         public Oscillator playOscillator;
@@ -25,7 +25,7 @@ namespace ON.synth
 
         [Tooltip("The gameobject with an audio source to instantiate (not required)")]
         public GameObject audioInstance;
-        
+
         // public bool ascending;
         public float playValue = 0;
         public bool crop;
@@ -52,15 +52,32 @@ namespace ON.synth
 
         void Start()
         {
-            if(sampleParent!=null){
+            if (sampleParent != null)
+            {
                 Destroy(sampleParent);
             }
-            if(this.transform.Find("SampleParent")!=null){
+            if (this.transform.Find("SampleParent") != null)
+            {
                 Destroy(this.transform.Find("SampleParent").gameObject);
             }
             sources = new List<AudioSource>();
-            if(conductor==null){
-                conductor = FindObjectOfType<Conductor>();
+            if (conductor == null)
+            {
+                Conductor[] conductors = FindObjectsOfType<Conductor>();
+                Transform parentTransform = this.transform;
+                while (parentTransform != null) // continue as long as there are parents
+                {
+                    for (int i = 0; i < conductors.Length; i++)
+                    {
+                        if (parentTransform.gameObject == conductors[i].gameObject)
+                        {
+                            conductor = conductors[i];
+                            Debug.Log(this.gameObject.name + " Found Conductor: " + conductors[i].gameObject.name);
+                            break;
+                        }
+                    }
+                    parentTransform = parentTransform.parent; // move to the next parent
+                }
             }
         }
 
@@ -105,7 +122,7 @@ namespace ON.synth
         //     //         g = new GameObject(this.name + "_Note");
         //     //         g.AddComponent<AudioSource>();
         //     //     }
-                
+
         //     //     AudioSource a = g.GetComponent<AudioSource>();
         //     //     a.clip = audio.clip;
         //     //     if (volumeOscillator)
@@ -119,7 +136,7 @@ namespace ON.synth
         //     //     if(crop){
         //     //         a.time = inTime;
         //     //     }
-                
+
         //     //     a.Play();
         //     //     sources.Add(a);
         //     //     if(sampleParent==null){
@@ -128,7 +145,7 @@ namespace ON.synth
         //     //     }
         //     //     g.transform.parent = sampleParent.transform;
         //     // }
-        
+
         // }
 
         // Update is called once per frame
@@ -145,48 +162,53 @@ namespace ON.synth
             //     StopCoroutine(player);
             //     player = null;
             // }
-            if (volumeOscillator != null){
-                audio.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-                if (volumeTrigger != null){
+            if (volumeOscillator != null)
+            {
+                audio.volume = volumeOscillator.GetValue() * ((conductor != null) ? conductor.masterVolume : 1);
+                if (volumeTrigger != null)
+                {
                     audio.volume *= volumeTrigger.GetValue();
-                    if(debug){
+                    if (debug)
+                    {
                         print(volumeTrigger.GetValue());
                         print(audio.volume);
                     }
                 }
             }
             else if (volumeTrigger != null)
-                audio.volume = volumeTrigger.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-            else if(conductor!=null)
+                audio.volume = volumeTrigger.GetValue() * ((conductor != null) ? conductor.masterVolume : 1);
+            else if (conductor != null)
                 audio.volume = conductor.masterVolume;
 
-            
-            if (pitchOscillator != null){
+
+            if (pitchOscillator != null)
+            {
                 audio.pitch = pitchOscillator.GetValue();
                 if (pitchTrigger != null)
                     audio.pitch *= pitchTrigger.GetValue();
             }
             else if (pitchTrigger != null)
-                audio.pitch = pitchTrigger.GetValue() ;
+                audio.pitch = pitchTrigger.GetValue();
 
-            if (panOscillator != null){
+            if (panOscillator != null)
+            {
                 audio.panStereo = panOscillator.GetValue();
                 if (panTrigger != null)
                     audio.panStereo *= panTrigger.GetValue();
             }
             else if (panTrigger != null)
-                audio.panStereo = panTrigger.GetValue() ;
+                audio.panStereo = panTrigger.GetValue();
 
 
 
-            if (volumeOscillator)
-                audio.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-            else if(conductor!=null)
-                audio.volume = conductor.masterVolume;
-            if (pitchOscillator)
-                audio.pitch = pitchOscillator.GetValue();
-            if (panOscillator)
-                audio.panStereo = panOscillator.GetValue();
+            // if (volumeOscillator)
+            //     audio.volume = volumeOscillator.GetValue() * ((conductor != null) ? conductor.masterVolume : 1);
+            // else if (conductor != null)
+            //     audio.volume = conductor.masterVolume;
+            // if (pitchOscillator)
+            //     audio.pitch = pitchOscillator.GetValue();
+            // if (panOscillator)
+            //     audio.panStereo = panOscillator.GetValue();
 
             if (playOscillator || playTrigger)
             {
@@ -201,57 +223,65 @@ namespace ON.synth
                     if (clipParent != null)
                     {
                         audio.clip = clipParent.transform.GetChild(Random.Range(0, clipParent.transform.childCount)).GetComponent<AudioSource>().clip;
-                        if(!randomizeClips){
+                        if (!randomizeClips)
+                        {
                             audio.clip = clipParent.transform.GetChild(whichAudioClip).GetComponent<AudioSource>().clip;
                             whichAudioClip++;
-                            if(whichAudioClip>=clipParent.transform.childCount){
+                            if (whichAudioClip >= clipParent.transform.childCount)
+                            {
                                 whichAudioClip = 0;
                             }
                         }
                     }
-                    if(!instantiateSource){
+                    if (!instantiateSource)
+                    {
 
                         if (volumeOscillator)
-                            audio.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-                        else if(conductor!=null)
+                            audio.volume = volumeOscillator.GetValue() * ((conductor != null) ? conductor.masterVolume : 1);
+                        else if (conductor != null)
                             audio.volume = conductor.masterVolume;
                         if (pitchOscillator)
                             audio.pitch = pitchOscillator.GetValue();
                         if (panOscillator)
                             audio.panStereo = panOscillator.GetValue();
 
-                        if(crop){
+                        if (crop)
+                        {
                             audio.time = inTime;
                         }
                         audio.Stop();
                         audio.Play();
                     }
-                    else{
+                    else
+                    {
                         GameObject g;
-                        if(audioInstance!=null)
+                        if (audioInstance != null)
                             g = Instantiate(audioInstance);
-                        else{
+                        else
+                        {
                             g = new GameObject(this.name + "_Note");
                             g.AddComponent<AudioSource>();
                         }
-                        
+
                         AudioSource a = g.GetComponent<AudioSource>();
                         a.clip = audio.clip;
                         if (volumeOscillator)
-                            a.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-                        else if(conductor!=null)
+                            a.volume = volumeOscillator.GetValue() * ((conductor != null) ? conductor.masterVolume : 1);
+                        else if (conductor != null)
                             a.volume = conductor.masterVolume;
                         if (pitchOscillator)
                             a.pitch = pitchOscillator.GetValue();
                         if (panOscillator)
                             a.panStereo = panOscillator.GetValue();
-                        if(crop){
+                        if (crop)
+                        {
                             a.time = inTime;
                         }
-                        
+
                         a.Play();
                         sources.Add(a);
-                        if(sampleParent==null){
+                        if (sampleParent == null)
+                        {
                             sampleParent = new GameObject("SampleParent");
                             sampleParent.transform.parent = this.transform;
                         }
@@ -260,18 +290,22 @@ namespace ON.synth
                 }
                 prevPlayOscillatorCounter = p;
             }
-            else if(!audio.isPlaying && forceAudioToPlay){
+            else if (!audio.isPlaying && forceAudioToPlay)
+            {
                 audio.Play();
             }
-            if(crop&&audio.isPlaying&&audio.time>outTime){
+            if (crop && audio.isPlaying && audio.time > outTime)
+            {
                 audio.Stop();
             }
             for (int i = 0; i < sources.Count; i++)
             {
-                if(crop&&sources[i].isPlaying&&sources[i].time>outTime){
+                if (crop && sources[i].isPlaying && sources[i].time > outTime)
+                {
                     sources[i].Stop();
                 }
-                if(!sources[i].isPlaying){
+                if (!sources[i].isPlaying)
+                {
                     Destroy(sources[i].gameObject);
                     sources.RemoveAt(i);
                 }
