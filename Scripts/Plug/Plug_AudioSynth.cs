@@ -7,49 +7,35 @@ namespace ON.synth
 {
     public class Plug_AudioSynth : MonoBehaviour
     {
-        // public float frequency;
-        // [Range(0,1)]
-        // public float volume;
-        // [Range(-1,1)]
-        // public float pan;
-
-        // float volumeCounter = 0;
-        // float prevVolume;
-        // float prevFrequency;
-        // float prevPan;
-
-        // [Tooltip("If neither are checked, audiosource's clip is modified")]
-        // public bool generateTone;
-        // public bool generateNoise;
 
         [System.Serializable]
-        public struct Oscillators{
+        public struct Oscillators
+        {
             public Oscillator volumeOscillator;
             public Oscillator frequencyOscillator;
             public Oscillator panOscillator;
         }
 
         [System.Serializable]
-        public struct tone{
+        public struct tone
+        {
             public float volume;
             public float frequency;
             public float pan;
-            public float counter {get;set;}
-            public float output {get;set;}
-            public float time {get;set;}
-            public float prevVolume {get;set;}
-            public float prevFrequency {get;set;}
-            public float prevPan {get;set;}
+            public float counter { get; set; }
+            public float output { get; set; }
+            public float time { get; set; }
+            public float prevVolume { get; set; }
+            public float prevFrequency { get; set; }
+            public float prevPan { get; set; }
             public Oscillators oscillators;
-            // public Oscillator volumeOscillator;
-            // public Oscillator frequencyOscillator;
-            // public Oscillator panOscillator;
-            public bool volumeOscillateUpdate {get;set;}
-            public bool frequencyOscillateUpdate {get;set;}
-            public bool panOscillateUpdate {get;set;}
+            public bool volumeOscillateUpdate { get; set; }
+            public bool frequencyOscillateUpdate { get; set; }
+            public bool panOscillateUpdate { get; set; }
         }
+
         [Tooltip("X: amplitude, Y: frequency")]
-        
+
         public tone[] tones;
 
         float sampleRate;
@@ -65,10 +51,11 @@ namespace ON.synth
             // usingClip = GetComponent<AudioSource>().clip != null;
         }
 
-        void OnAudioFilterRead (float[] data, int channels) {
+        void OnAudioFilterRead(float[] data, int channels)
+        {
             for (int i = 0; i < tones.Length; i++)
             {
-                
+
                 // if(tones[i].volumeOscillator!=null)
                 //     tones[i].volume = tones[i].volumeOscillator.GetValue(tones[i].time);
                 // if(tones[i].frequencyOscillator!=null)
@@ -79,23 +66,14 @@ namespace ON.synth
                 tones[i].frequencyOscillateUpdate = false;
                 tones[i].panOscillateUpdate = false;
             }
-            
-            for (int i = 0; i < data.Length; i += channels) {
-                float fraction = ((float)i/data.Length);
-                // if(i==0)
-                    // print(fraction + " , " + i + " , " + data.Length);
-                // float panLerp = Mathf.Lerp(prevPan,pan,fraction);
-                // float frequencyLerp = Mathf.Lerp(prevFrequency,frequency,fraction);
-                // float volumeLerp = Mathf.Lerp(prevVolume,volume,fraction);
-                // volumeCounter += (1f/sampleRate)*Mathf.PI*2*frequencyLerp;
-                // volumeCounter = volumeCounter % (Mathf.PI*2);
-                // float val =  1;//volumeLerp * (Mathf.Sin( volumeCounter ));
-                // if(generateNoise)
-                //     val = volumeLerp * ((float)noise.Noise((double)Mathf.Sin(volumeCounter)*10000,(double)Mathf.Cos(volumeCounter)*10000,0)-.5f)*2;// + ((float)noise.Noise((double)Mathf.Sin(volumeCounter)*100,(double)Mathf.Cos(volumeCounter)*100,(double)Mathf.Cos(volumeCounter)*100)-.5f));
-                float[] multiVal = MultiTone((float)1/(float)sampleRate, fraction);
+
+            for (int i = 0; i < data.Length; i += channels)
+            {
+                float fraction = ((float)i / data.Length);
+                float[] multiVal = MultiTone((float)1 / (float)sampleRate, fraction);
                 data[i] = multiVal[0];// * (channels==2?Mathf.Clamp(Mathf.Abs(1-panLerp),0,1):1);
-                if(channels==2)
-                    data[i+1] =  multiVal[1];//((generateTone||generateNoise?1:usingClip?data[i+1]:1) * val * multiVal[1]) * Mathf.Clamp((panLerp+1),0,1);
+                if (channels == 2)
+                    data[i + 1] = multiVal[1];//((generateTone||generateNoise?1:usingClip?data[i+1]:1) * val * multiVal[1]) * Mathf.Clamp((panLerp+1),0,1);
             }
 
             //  print(tones[0].prevVolume + " | " + tones[0].volume);
@@ -110,53 +88,56 @@ namespace ON.synth
                 tones[i].volumeOscillateUpdate = true;
                 tones[i].frequencyOscillateUpdate = true;
                 tones[i].panOscillateUpdate = true;
-            
+
             }
-           
+
             // prevFrequency = frequency;
             // prevVolume = volume;
             // prevPan = pan;
         }
 
-        void Update(){
+        void Update()
+        {
             for (int i = 0; i < tones.Length; i++)
             {
-                
-                if(tones[i].oscillators.volumeOscillator!=null && tones[i].volumeOscillateUpdate)
+
+                if (tones[i].oscillators.volumeOscillator != null && tones[i].volumeOscillateUpdate)
                     tones[i].volume = Synth_Util.GetOscValue(tones[i].oscillators.volumeOscillator);
-                if(tones[i].oscillators.frequencyOscillator!=null && tones[i].frequencyOscillateUpdate)
+                if (tones[i].oscillators.frequencyOscillator != null && tones[i].frequencyOscillateUpdate)
                     tones[i].frequency = Synth_Util.GetOscValue(tones[i].oscillators.frequencyOscillator);
-                if(tones[i].oscillators.panOscillator!=null && tones[i].panOscillateUpdate)
+                if (tones[i].oscillators.panOscillator != null && tones[i].panOscillateUpdate)
                     tones[i].pan = Synth_Util.GetOscValue(tones[i].oscillators.panOscillator);
-                
+
             }
         }
 
-        float[] MultiTone(float t, float fraction){
+        float[] MultiTone(float t, float fraction)
+        {
 
-            float[] value = new float[]{0,0};
+            float[] value = new float[] { 0, 0 };
 
             for (int i = 0; i < tones.Length; i++)
             {
-                float pan = Mathf.Lerp(tones[i].prevPan,tones[i].pan,fraction);
-                float volume = Mathf.Lerp(tones[i].prevVolume,tones[i].volume,fraction);
-                float frequency = Mathf.Lerp(tones[i].prevFrequency,tones[i].frequency,fraction);
+                float pan = Mathf.Lerp(tones[i].prevPan, tones[i].pan, fraction);
+                float volume = Mathf.Lerp(tones[i].prevVolume, tones[i].volume, fraction);
+                float frequency = Mathf.Lerp(tones[i].prevFrequency, tones[i].frequency, fraction);
 
-                tones[i].counter += t*frequency*Mathf.PI*2;
-                tones[i].counter = tones[i].counter % (Mathf.PI*2);
-                tones[i].output = volume * (Mathf.Sin( tones[i].counter ));
-                
-                value[0] += tones[i].output * Mathf.Clamp(Mathf.Abs(1-pan),0,1);
-                value[1] += tones[i].output * Mathf.Clamp((pan+1),0,1);
+                tones[i].counter += t * frequency * Mathf.PI * 2;
+                tones[i].counter = tones[i].counter % (Mathf.PI * 2);
+                tones[i].output = volume * (Mathf.Sin(tones[i].counter));
+
+                value[0] += tones[i].output * Mathf.Clamp(Mathf.Abs(1 - pan), 0, 1);
+                value[1] += tones[i].output * Mathf.Clamp((pan + 1), 0, 1);
             }
 
-            if(tones.Length==0){
+            if (tones.Length == 0)
+            {
                 value[0] = 1;
                 value[1] = 1;
             }
 
             return value;
-            
+
         }
     }
 }

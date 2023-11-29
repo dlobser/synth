@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace ON.synth
@@ -8,9 +9,9 @@ namespace ON.synth
     public class Oscillator_LFO : Oscillator
     {
         public string info;
-        public AnimationCurve aCurve;
-        public float aCurveRange = 1;
-        public bool active;
+        public AnimationCurve displayCurve;
+        public float displayCurveRange = 1;
+        [HideInInspector]
         public bool resetAllCounters;
 
         [Header("Values")]
@@ -43,6 +44,7 @@ namespace ON.synth
 
         [Header("Display")]
         public LineRenderer line;
+        public bool showLine;
         public int lineLength = 100;
 
         public Conductor conductor;
@@ -78,7 +80,7 @@ namespace ON.synth
             for (int i = 0; i < 60; i++)
             {
                 float v = ((float)i / 60f);
-                aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+                displayCurve.AddKey(new Keyframe(v, GetValue(v * displayCurveRange)));
             }
         }
 
@@ -128,10 +130,18 @@ namespace ON.synth
                 ResetAllCounters();
                 resetAllCounters = false;
             }
-
-            if (line != null)
+            if (line == null && showLine)
             {
-                line.positionCount = lineLength;
+                line = this.AddComponent<LineRenderer>();
+                line.widthMultiplier = .1f;
+                line.material = new Material(Shader.Find("Sprites/Default"));
+
+                line.material.color = Color.white;
+            }
+            if (line != null && showLine)
+            {
+                line.enabled = true;
+                line.positionCount = Mathf.Max(1, lineLength);
                 Vector3[] l = new Vector3[lineLength];
 
                 for (int i = 0; i < l.Length; i++)
@@ -141,37 +151,42 @@ namespace ON.synth
                 }
                 line.SetPositions(l);
             }
-            if (aCurve == null)
+            if (line != null && !showLine)
             {
-                aCurve = new AnimationCurve();
+                line.enabled = false;
             }
-            if (aCurve.keys == null)
+
+            if (displayCurve == null)
+            {
+                displayCurve = new AnimationCurve();
+            }
+            if (displayCurve.keys == null)
             {
                 for (int i = 0; i < 60; i++)
                 {
                     float v = ((float)i / 60f);
-                    aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+                    displayCurve.AddKey(new Keyframe(v, GetValue(v * displayCurveRange)));
                 }
             }
-            if (aCurve.keys.Length < 60)
+            if (displayCurve.keys.Length < 60)
             {
                 for (int i = 0; i < 60; i++)
                 {
                     float v = ((float)i / 60f);
-                    aCurve.AddKey(new Keyframe(v, GetValue(v * aCurveRange)));
+                    displayCurve.AddKey(new Keyframe(v, GetValue(v * displayCurveRange)));
                 }
             }
 
             for (int i = 0; i < 60; i++)
             {
                 float v = ((float)i / 60f);
-                aCurve.MoveKey(i, new Keyframe(v, GetValue(v * aCurveRange)));
+                displayCurve.MoveKey(i, new Keyframe(v, GetValue(v * displayCurveRange)));
             }
 
             info = "Counter: " + counter + ", " + "Value: " + GetValue();
         }
 
-        void ResetAllCounters()
+        public void ResetAllCounters()
         {
             Oscillator[] oscillators = FindObjectsOfType<Oscillator>();
             ResetCounter();
