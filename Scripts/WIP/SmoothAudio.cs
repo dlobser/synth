@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ImageTools.Core;
+using ON.synth;
+// using ImageTools.Core;
 
 public class SmoothAudio : MonoBehaviour
 {

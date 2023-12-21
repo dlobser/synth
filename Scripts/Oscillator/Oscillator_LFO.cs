@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+// using Unity.Mathematics;
 
 namespace ON.synth
 {
@@ -17,8 +18,8 @@ namespace ON.synth
         [Header("Values")]
         public float trough = -1;
         public float crest = 1;
-        public float clampLow = -1;
-        public float clampHigh = 1;
+        public float clampLow = -1000;
+        public float clampHigh = 1000;
         public float offset;
         public float timeOffset;
         public float multiply = 1;
@@ -52,9 +53,13 @@ namespace ON.synth
 
         float sampleRate;
 
+        PerlinNoise pNoise;
+
         void Start()
         {
             counter = 0;
+
+            pNoise = new PerlinNoise(0);
 
             if (conductor == null)
             {
@@ -80,7 +85,8 @@ namespace ON.synth
             for (int i = 0; i < 60; i++)
             {
                 float v = ((float)i / 60f);
-                displayCurve.AddKey(new Keyframe(v, GetValue(v * displayCurveRange)));
+                if(displayCurve!=null)
+                    displayCurve.AddKey(new Keyframe(v, GetValue(v * displayCurveRange)));
             }
         }
 
@@ -90,15 +96,17 @@ namespace ON.synth
         }
 
         void GetValues()
-        {
-            multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
-            speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
-            offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
-            trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
-            crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
-            clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
-            clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
-            timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+        {   
+            if(oscillators!=null){
+                multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
+                speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
+                offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
+                trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
+                crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
+                clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
+                clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
+                timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+            }
         }
 
         void OnAudioFilterRead(float[] data, int channels)
@@ -232,8 +240,8 @@ namespace ON.synth
                 qcounter /= quantize;
             }
 
-            if (useNoise)
-                s = Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
+            if (useNoise && pNoise!=null)
+                s = ((float)pNoise.Noise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
             else if (useCustom)
                 s = curve.Evaluate(Mathf.Pow(qcounter, counterPower) + (timeOffset));
             else
@@ -272,15 +280,17 @@ namespace ON.synth
                 counter = counter % 1;
 
             float t = c;
-
-            multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
-            speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
-            offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
-            trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
-            crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
-            clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
-            clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
-            timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+            
+            if(oscillators!=null){
+                multiply = ON.synth.Synth_Util.GetOscTrigValue(oscillators.multiplyOscillate, triggers.multiplyTrigger, multiply);
+                speed = ON.synth.Synth_Util.GetOscTrigValue(oscillators.speedOscillate, triggers.speedTrigger, speed);
+                offset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.offsetOscillate, triggers.offsetTrigger, offset);
+                trough = ON.synth.Synth_Util.GetOscTrigValue(oscillators.troughOscillate, triggers.troughTrigger, trough);
+                crest = ON.synth.Synth_Util.GetOscTrigValue(oscillators.crestOscillate, triggers.crestTrigger, crest);
+                clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
+                clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
+                timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+            }
 
             float s;
 
@@ -292,7 +302,8 @@ namespace ON.synth
             }
 
             if (useNoise)
-                s = Mathf.PerlinNoise(Mathf.Pow(counter, counterPower) + (timeOffset), 0);
+                s = ((float)pNoise.Noise(Mathf.Pow(counter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
+//Mathf.PerlinNoise(Mathf.Pow(counter, counterPower) + (timeOffset), 0);
             else if (useCustom)
                 s = curve.Evaluate(Mathf.Pow(counter, counterPower) + (timeOffset));
             else

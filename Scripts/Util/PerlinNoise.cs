@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ImageTools.Core
+namespace ON.synth
 {
 
 	/* Perlin noise class.  ( by Tom Nuydens (tom@delphi3d.net) )
