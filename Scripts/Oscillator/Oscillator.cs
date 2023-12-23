@@ -16,6 +16,7 @@ namespace ON.synth
         public Oscillator clampLowOscillate;
         public Oscillator clampHighOscillate;
         public Oscillator timeOffsetOscillate;
+        public Oscillator quantizeOscillate;
     }
 
     [System.Serializable]
@@ -29,6 +30,7 @@ namespace ON.synth
         public Trigger clampLowTrigger;
         public Trigger clampHighTrigger;
         public Trigger timeOffsetTrigger;
+        public Trigger quantizeTrigger;
     }
 
     [System.Serializable]

@@ -106,6 +106,7 @@ namespace ON.synth
                 clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
                 clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
                 timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+                quantize = ON.synth.Synth_Util.GetOscTrigValue(oscillators.quantizeOscillate, triggers.quantizeTrigger, quantize);
             }
         }
 
@@ -290,6 +291,7 @@ namespace ON.synth
                 clampLow = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampLowOscillate, triggers.clampLowTrigger, clampLow);
                 clampHigh = ON.synth.Synth_Util.GetOscTrigValue(oscillators.clampHighOscillate, triggers.clampHighTrigger, clampHigh);
                 timeOffset = ON.synth.Synth_Util.GetOscTrigValue(oscillators.timeOffsetOscillate, triggers.timeOffsetTrigger, timeOffset);
+                quantize = ON.synth.Synth_Util.GetOscTrigValue(oscillators.quantizeOscillate, triggers.quantizeTrigger, quantize);
             }
 
             float s;

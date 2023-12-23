@@ -31,20 +31,22 @@ namespace ON.synth
         private void InitializeMaterials()
         {
             materials = new List<Material>();
-            if (affectChildren)
-            {
-                var renderers = target.GetComponentsInChildren<Renderer>();
-                foreach (var renderer in renderers)
+            if(target != null){
+                if (affectChildren)
                 {
-                    materials.AddRange(renderer.materials);
+                    var renderers = target.GetComponentsInChildren<Renderer>();
+                    foreach (var renderer in renderers)
+                    {
+                        materials.AddRange(renderer.materials);
+                    }
                 }
-            }
-            else
-            {
-                var renderer = target.GetComponent<Renderer>();
-                if (renderer != null)
+                else
                 {
-                    materials.AddRange(renderer.materials);
+                    var renderer = target.GetComponent<Renderer>();
+                    if (renderer != null)
+                    {
+                        materials.AddRange(renderer.materials);
+                    }
                 }
             }
         }
@@ -52,7 +54,10 @@ namespace ON.synth
         void Update()
         {
             float value = Synth_Util.GetOscTrigValue(oscillator, trigger);
-            ApplyShaderProperty(value);
+            // if(materials == null || materials.Count==0)
+                InitializeMaterials();
+            // else
+                ApplyShaderProperty(value);
         }
 
         void ApplyShaderProperty(float controlValue)

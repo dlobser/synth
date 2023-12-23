@@ -10,14 +10,21 @@ namespace ON.synth
         public float lowValue;
         public float highValue;
         public Oscillator_LFO oscillator;
+        public float value;
 
         public override float GetValue()
         {
-            return ON.synth.Synth_Util.map(oscillator.GetValue(), oscillator.clampLow, oscillator.clampHigh, lowValue, highValue);
+            float inLow = Mathf.Max(oscillator.clampLow,oscillator.trough*oscillator.multiply+oscillator.offset);
+            float inHigh = Mathf.Min(oscillator.clampHigh,oscillator.crest*oscillator.multiply+oscillator.offset);
+            value = ON.synth.Synth_Util.map(oscillator.GetValue(), inLow, inHigh, lowValue, highValue);
+            return value;
         }
+
         public override float GetValue(float t)
         {
-            return ON.synth.Synth_Util.map(oscillator.GetValue(t), oscillator.clampLow, oscillator.clampHigh, lowValue, highValue);
+            float inLow = Mathf.Max(oscillator.clampLow,oscillator.trough*oscillator.multiply+oscillator.offset);
+            float inHigh = Mathf.Min(oscillator.clampHigh,oscillator.crest*oscillator.multiply+oscillator.offset);
+            return ON.synth.Synth_Util.map(oscillator.GetValue(t), inLow, inHigh, lowValue, highValue);
         }
     }
 }
