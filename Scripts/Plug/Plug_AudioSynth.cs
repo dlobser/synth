@@ -58,6 +58,30 @@ namespace ON.synth
             // usingClip = GetComponent<AudioSource>().clip != null;
         }
 
+        public void SetTones(Plug_AudioSynth.tone[] newTones)
+        {
+            if (tones.Length != newTones.Length)
+            {
+                // If lengths are different, just replace the array
+                tones = newTones;
+            }
+            else
+            {
+                // If lengths are the same, copy properties from newTones to tones
+                for (int i = 0; i < newTones.Length; i++)
+                {
+                    tones[i].volume = newTones[i].volume;
+                    tones[i].frequency = newTones[i].frequency;
+                    tones[i].pan = newTones[i].pan;
+                    tones[i].useNoise = newTones[i].useNoise;
+                    tones[i].useCustomCurve = newTones[i].useCustomCurve;
+                    tones[i].curve = newTones[i].curve;
+                    // Copy other properties as needed
+                }
+            }
+        }
+
+
         void OnAudioFilterRead(float[] data, int channels)
         {
             for (int i = 0; i < tones.Length; i++)
