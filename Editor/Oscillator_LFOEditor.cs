@@ -82,6 +82,7 @@ public class Oscillator_LFOEditor : Editor
             script.oscillators.clampLowOscillate = (Oscillator)EditorGUILayout.ObjectField("Clamp Low Oscillate", script.oscillators.clampLowOscillate, typeof(Oscillator), true);
             script.oscillators.clampHighOscillate = (Oscillator)EditorGUILayout.ObjectField("Clamp High Oscillate", script.oscillators.clampHighOscillate, typeof(Oscillator), true);
             script.oscillators.timeOffsetOscillate = (Oscillator)EditorGUILayout.ObjectField("Time Offset Oscillate", script.oscillators.timeOffsetOscillate, typeof(Oscillator), true);
+            script.oscillators.quantizeOscillate = (Oscillator)EditorGUILayout.ObjectField("Quantiuze Oscillate", script.oscillators.quantizeOscillate, typeof(Oscillator), true);
             EditorGUI.indentLevel--;
         }
 
@@ -96,7 +97,7 @@ public class Oscillator_LFOEditor : Editor
             script.triggers.crestTrigger = (Trigger)EditorGUILayout.ObjectField("Crest Trigger", script.triggers.crestTrigger, typeof(Trigger), true);
             script.triggers.clampLowTrigger = (Trigger)EditorGUILayout.ObjectField("Clamp Low Trigger", script.triggers.clampLowTrigger, typeof(Trigger), true);
             script.triggers.clampHighTrigger = (Trigger)EditorGUILayout.ObjectField("Clamp High Trigger", script.triggers.clampHighTrigger, typeof(Trigger), true);
-            script.triggers.timeOffsetTrigger = (Trigger)EditorGUILayout.ObjectField("Time Offset Trigger", script.triggers.timeOffsetTrigger, typeof(Trigger), true);
+            script.triggers.quantizeTrigger = (Trigger)EditorGUILayout.ObjectField("Quantize Trigger", script.triggers.quantizeTrigger, typeof(Trigger), true);
             EditorGUI.indentLevel--;
         }
 
