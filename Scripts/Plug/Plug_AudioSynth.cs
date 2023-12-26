@@ -89,13 +89,14 @@ namespace ON.synth
                     tones[i].volume = newTones[i].volume;
                     tones[i].frequency = newTones[i].frequency;
                     tones[i].pan = newTones[i].pan;
-                    tones[i].useNoise = newTones[i].useNoise;
-                    tones[i].useCustomCurve = newTones[i].useCustomCurve;
-                    tones[i].curve = newTones[i].curve;
-                    // Copy other properties as needed
+                    tones[i].advanced.doppler = newTones[i].advanced.doppler;
+                    tones[i].advanced.useNoise = newTones[i].advanced.useNoise;
+                    tones[i].advanced.useCustomCurve = newTones[i].advanced.useCustomCurve;
+                    tones[i].advanced.curve = newTones[i].advanced.curve;
                 }
             }
         }
+
 
 
         void OnAudioFilterRead(float[] data, int channels)

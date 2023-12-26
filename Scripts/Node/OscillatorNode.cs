@@ -205,6 +205,9 @@ public class OscillatorLFONode : Unit
             qcounter /= quantize;
         }
 
+        if(pNoise==null)
+            pNoise = new PerlinNoise(0);
+
         if (useNoise && pNoise!=null)
             s = ((float)pNoise.Noise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
         else if (useCustom)
