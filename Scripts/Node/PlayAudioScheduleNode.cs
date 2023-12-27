@@ -22,6 +22,9 @@ public class PlayAudioScheduledNode : Unit
     [DoNotSerialize]
     public ControlOutput playedOutput;
 
+     [DoNotSerialize]
+    public ControlOutput triggerOutput;
+
     private double nextPlayTime = 0;
     private int currentIndex = 0;
 
@@ -32,9 +35,11 @@ public class PlayAudioScheduledNode : Unit
         pitchInput = ValueInput<float>("Pitch", 1f); // Default pitch is 1
         volumeInput = ValueInput<float>("Volume", 1f); // Default volume is 1
         panInput = ValueInput<float>("Pan", 0f); // Default pan is centered (0)
+            execute = ControlInput("", PlayAudio);
+        playedOutput = ControlOutput("");
+        triggerOutput = ControlOutput("Played");
 
-        execute = ControlInput("Execute", PlayAudio);
-        playedOutput = ControlOutput("Played");
+    
 
         Requirement(audioSourcesInput, execute);
         Requirement(intervalInput, execute);
@@ -69,6 +74,8 @@ public class PlayAudioScheduledNode : Unit
                     nextPlayTime = currentTime + interval;
 
                     currentIndex = (currentIndex + 1) % audioSources.Count;
+
+                    flow.Invoke(triggerOutput);
                 }
             }
         }
