@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-[UnitCategory("Custom/Math")]
+[UnitCategory("ON/Math")]
 [UnitTitle("Remap Curve")]
 public class RemapCurve : Unit
 {

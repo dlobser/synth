@@ -2,7 +2,7 @@ using Unity.VisualScripting;
 using ON.synth;
 using UnityEngine;
 
-[UnitCategory("Custom/Audio")]
+[UnitCategory("ON/Audio")]
 [UnitTitle("Plug Audio Synth")]
 public class PlugAudioSynthNode : Unit
 {

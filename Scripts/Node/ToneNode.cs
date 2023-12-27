@@ -2,8 +2,8 @@ using Unity.VisualScripting;
 using ON.synth;
 using UnityEngine;
 
-[UnitCategory("Custom/Audio")]
-[UnitTitle("Generate Single Tone")]
+[UnitCategory("ON/Audio")]
+[UnitTitle("Tone")]
 public class ToneNode : Unit
 {
     [DoNotSerialize]

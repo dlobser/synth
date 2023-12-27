@@ -3,7 +3,7 @@ using ON.synth;
 using UnityEngine;
 
 
-[UnitCategory("Custom/Oscillator")]
+[UnitCategory("ON/Oscillator")]
 public class OscillatorLFONode : Unit
 {
     

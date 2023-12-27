@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-[UnitCategory("Custom/Oscillator")]
+[UnitCategory("ON/Oscillator")]
 [UnitTitle("Oscillator Update")]
 public class OscillatorUpdateNode : Unit
 {

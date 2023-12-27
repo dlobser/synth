@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.VisualScripting;
 using System.Collections.Generic;
 
-[UnitCategory("Custom/Audio")]
+[UnitCategory("ON/Audio")]
 [UnitTitle("Play Audio Scheduled")]
 public class PlayAudioScheduledNode : Unit
 {

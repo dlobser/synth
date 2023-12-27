@@ -1,7 +1,7 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
-[UnitCategory("Custom/Audio")]
+[UnitCategory("ON/Audio")]
 [UnitTitle("Generate Tone")]
 public class GenerateToneNode : Unit
 {

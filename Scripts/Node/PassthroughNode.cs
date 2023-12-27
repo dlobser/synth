@@ -1,6 +1,6 @@
 using Unity.VisualScripting;
 
-[UnitCategory("Custom/PassThrough")]
+[UnitCategory("ON/PassThrough")]
 [UnitTitle("Pass Through")]
 public class PassthroughNode : Unit
 {
