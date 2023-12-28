@@ -138,21 +138,27 @@ namespace ON.synth
         
         void Update()
         {
-            if(audioSource.spatialBlend!=0)
+            if(audioSource.spatialBlend!=0){
                 stereoPan = Mathf.Lerp(0,CalculateStereoPan(transform.position, Camera.main.transform),audioSource.spatialBlend);
+            }
 
-            doppler = CalculateDopplerShift(this.transform.position,Camera.main.transform.position,0);
+            bool calculateDoppler = false;
                 
             for (int i = 0; i < tones.Length; i++)
             {
-
                 if (tones[i].advanced.oscillators.volumeOscillator != null && tones[i].volumeOscillateUpdate)
                     tones[i].volume = Synth_Util.GetOscValue(tones[i].advanced.oscillators.volumeOscillator);
                 if (tones[i].advanced.oscillators.frequencyOscillator != null && tones[i].frequencyOscillateUpdate)
                     tones[i].frequency = Synth_Util.GetOscValue(tones[i].advanced.oscillators.frequencyOscillator);
                 if (tones[i].advanced.oscillators.panOscillator != null && tones[i].panOscillateUpdate)
                     tones[i].pan = Synth_Util.GetOscValue(tones[i].advanced.oscillators.panOscillator);
+                if(tones[i].advanced.doppler!=0)
+                    calculateDoppler = true;
             }
+
+            if(calculateDoppler)
+                doppler = CalculateDopplerShift(this.transform.position,Camera.main.transform.position,0);
+
         }
 
         public float CalculateStereoPan(Vector3 objectPosition, Transform listenerTransform)
