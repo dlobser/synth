@@ -211,7 +211,7 @@ public class OscillatorLFONode : Unit
         if (useNoise && pNoise!=null)
             s = ((float)pNoise.Noise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
         else if (useCustom)
-            s = curve.Evaluate((Mathf.Pow(qcounter, counterPower) + (timeOffset))%1);
+            s = curve.Evaluate((Mathf.Pow(qcounter, counterPower) + (timeOffset)));
         else
             s = Mathf.Cos(Mathf.Pow(qcounter, counterPower) * Mathf.PI * 2 + (timeOffset % 1) * Mathf.PI * 2);
 
