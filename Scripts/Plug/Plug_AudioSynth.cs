@@ -143,17 +143,19 @@ namespace ON.synth
             }
 
             bool calculateDoppler = false;
-                
-            for (int i = 0; i < tones.Length; i++)
-            {
-                if (tones[i].advanced.oscillators.volumeOscillator != null && tones[i].volumeOscillateUpdate)
-                    tones[i].volume = Synth_Util.GetOscValue(tones[i].advanced.oscillators.volumeOscillator);
-                if (tones[i].advanced.oscillators.frequencyOscillator != null && tones[i].frequencyOscillateUpdate)
-                    tones[i].frequency = Synth_Util.GetOscValue(tones[i].advanced.oscillators.frequencyOscillator);
-                if (tones[i].advanced.oscillators.panOscillator != null && tones[i].panOscillateUpdate)
-                    tones[i].pan = Synth_Util.GetOscValue(tones[i].advanced.oscillators.panOscillator);
-                if(tones[i].advanced.doppler!=0)
-                    calculateDoppler = true;
+            
+            if(tones!=null){
+                for (int i = 0; i < tones.Length; i++)
+                {
+                    if (tones[i].advanced.oscillators.volumeOscillator != null && tones[i].volumeOscillateUpdate)
+                        tones[i].volume = Synth_Util.GetOscValue(tones[i].advanced.oscillators.volumeOscillator);
+                    if (tones[i].advanced.oscillators.frequencyOscillator != null && tones[i].frequencyOscillateUpdate)
+                        tones[i].frequency = Synth_Util.GetOscValue(tones[i].advanced.oscillators.frequencyOscillator);
+                    if (tones[i].advanced.oscillators.panOscillator != null && tones[i].panOscillateUpdate)
+                        tones[i].pan = Synth_Util.GetOscValue(tones[i].advanced.oscillators.panOscillator);
+                    if(tones[i].advanced.doppler!=0)
+                        calculateDoppler = true;
+                }
             }
 
             if(calculateDoppler)
