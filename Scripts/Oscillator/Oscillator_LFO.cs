@@ -80,6 +80,7 @@ namespace ON.synth
                     parentTransform = parentTransform.parent; // move to the next parent
                 }
             }
+
             sampleRate = AudioSettings.outputSampleRate;
 
             for (int i = 0; i < 60; i++)
