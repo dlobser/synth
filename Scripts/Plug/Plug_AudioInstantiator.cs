@@ -126,12 +126,18 @@ namespace ON.synth
                         GetComponent<AudioSource>().time = inTime;
                     }
                     // audio.Stop();
+                    // if (frequencyChanged)
+                    // {
+                    //     print("Adjust: " + playTime + " , " + Mathf.Ceil((float)playTime));
+                    //     playTime = Mathf.Ceil((float)playTime) + offset;
+                    //     frequencyChanged = false;
+
+                    // }
                     if (frequencyChanged)
                     {
-                        print("Adjust: " + playTime + " , " + Mathf.Ceil((float)playTime));
-                        playTime = Mathf.Ceil((float)playTime) + offset;
+                        float currentTime = (float)AudioSettings.dspTime;
+                        playTime = currentTime - ((currentTime - playTime) % (frequency));// + frequency;// (frequency / conductorSpeed) - ((currentTime - playTime) % (frequency / conductorSpeed));
                         frequencyChanged = false;
-
                     }
                     if (Synth_Util.GetOscTrigValue(oscillator, trigger) >= 0)
                     {
@@ -227,96 +233,11 @@ namespace ON.synth
 
             }
 
-
-
-
-            // if(playOscillator){
-            // if(player==null){
-            //     player = StartCoroutine(PlayOscillate());
-            // }
             if (prevPlaySpeed != frequency)
                 frequencyChanged = true;
 
             prevPlaySpeed = frequency;
-            // print(player==null);
-            //     playSpeed = playOscillator.GetValue();
-            // }
-            // else if(player!=null){
-            //     StopCoroutine(player);
-            //     player = null;
-            // }
-
-            // if (playOscillator || playTrigger)
-            // {
-            //     float p = 0;
-            //     if (playOscillator)
-            //         p = playOscillator.GetValue();
-            //     if (playTrigger)
-            //         p = playTrigger.GetValue();
-
-            //     if (p > playValue && prevPlayOscillatorCounter < playValue)
-            //     {
-            //         if (clipParent != null)
-            //         {
-            //             audio.clip = clipParent.transform.GetChild(Random.Range(0, clipParent.transform.childCount)).GetComponent<AudioSource>().clip;
-            //         }
-            //         if(!instantiateSource){
-
-            //             if (volumeOscillator)
-            //                 audio.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-            //             else if(conductor!=null)
-            //                 audio.volume = conductor.masterVolume;
-            //             if (pitchOscillator)
-            //                 audio.pitch = pitchOscillator.GetValue();
-            //             if (panOscillator)
-            //                 audio.panStereo = panOscillator.GetValue();
-
-            //             if(crop){
-            //                 audio.time = inTime;
-            //             }
-            //             audio.Stop();
-            //             audio.Play();
-            //         }
-            //         else{
-            //             GameObject g;
-            //             if(audioInstance!=null)
-            //                 g = Instantiate(audioInstance);
-            //             else{
-            //                 g = new GameObject(this.name + "_Note");
-            //                 g.AddComponent<AudioSource>();
-            //             }
-
-            //             AudioSource a = g.GetComponent<AudioSource>();
-            //             a.clip = audio.clip;
-            //             if (volumeOscillator)
-            //                 a.volume = volumeOscillator.GetValue() * ((conductor!=null)?conductor.masterVolume:1);
-            //             else if(conductor!=null)
-            //                 a.volume = conductor.masterVolume;
-            //             if (pitchOscillator)
-            //                 a.pitch = pitchOscillator.GetValue();
-            //             if (panOscillator)
-            //                 a.panStereo = panOscillator.GetValue();
-            //             if(crop){
-            //                 a.time = inTime;
-            //             }
-
-            //             a.Play();
-            //             sources.Add(a);
-            //             if(sampleParent==null){
-            //                 sampleParent = new GameObject("SampleParent");
-            //                 sampleParent.transform.parent = this.transform;
-            //             }
-            //             g.transform.parent = sampleParent.transform;
-            //         }
-            //     }
-            //     prevPlayOscillatorCounter = p;
-            // }
-            // else if(!audio.isPlaying && forceAudioToPlay){
-            //     audio.Play();
-            // }
-            // if(crop&&audio.isPlaying&&audio.time>outTime){
-            //     audio.Stop();
-            // }
+            
             for (int i = 0; i < sources.Count; i++)
             {
                 if (crop && sources[i].isPlaying && sources[i].time > outTime)
