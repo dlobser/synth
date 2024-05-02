@@ -16,6 +16,9 @@ namespace ON.synth{
 
         public Plug_AudioSynth plug; 
         float plugLerp = 0;
+        #if !UNITY_WEBGL
+//YOUR Microphone CODE HERE
+
 
         //mic initialization
         void InitMic(){
@@ -183,6 +186,7 @@ namespace ON.synth{
             float _fSample = AudioSettings.outputSampleRate;
             return freqN * (_fSample / 2) / QSamples; // convert index to frequency
         }
+        #endif
     }
  }
 

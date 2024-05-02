@@ -56,6 +56,11 @@ public class Oscillator_LFOEditor : Editor
             script.useNoise = EditorGUILayout.Toggle("Use Noise", script.useNoise);
             script.dontLoopCustomCurve = EditorGUILayout.Toggle("Don't Loop Custom Curve", script.dontLoopCustomCurve);
             script.useCustom = EditorGUILayout.Toggle("Use Custom", script.useCustom);
+            if(script.curve==null){
+                script.curve = new AnimationCurve();
+                script.curve.AddKey(new Keyframe(0,0));
+                script.curve.AddKey(new Keyframe(1,1));
+            }
             script.curve = EditorGUILayout.CurveField("Curve", script.curve);
             EditorGUI.indentLevel--;
         }

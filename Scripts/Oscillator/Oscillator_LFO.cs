@@ -57,6 +57,10 @@ namespace ON.synth
 
         void Start()
         {
+            if(curve==null){
+                curve = new AnimationCurve();
+                curve.AddKey(new Keyframe(0,0));
+            }
             counter = 0;
 
             pNoise = new PerlinNoise(0);
@@ -145,7 +149,7 @@ namespace ON.synth
                 line = this.AddComponent<LineRenderer>();
                 line.widthMultiplier = .1f;
                 line.material = new Material(Shader.Find("Sprites/Default"));
-
+                line.useWorldSpace = false;
                 line.material.color = Color.white;
             }
             if (line != null && showLine)
@@ -244,7 +248,7 @@ namespace ON.synth
 
             if (useNoise && pNoise!=null)
                 s = ((float)pNoise.Noise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
-            else if (useCustom)
+            else if (useCustom && curve!=null)
                 s = curve.Evaluate(Mathf.Pow(qcounter, counterPower) + (timeOffset));
             else
                 s = Mathf.Cos(Mathf.Pow(qcounter, counterPower) * Mathf.PI * 2 + (timeOffset % 1) * Mathf.PI * 2);
@@ -307,13 +311,13 @@ namespace ON.synth
             if (useNoise)
                 s = ((float)pNoise.Noise(Mathf.Pow(counter, counterPower) + (timeOffset), 0,0)*.95f)+.5f;// Mathf.PerlinNoise(Mathf.Pow(qcounter, counterPower) + (timeOffset), 0);
 //Mathf.PerlinNoise(Mathf.Pow(counter, counterPower) + (timeOffset), 0);
-            else if (useCustom)
+            else if (useCustom && curve!=null)
                 s = curve.Evaluate(Mathf.Pow(counter, counterPower) + (timeOffset));
             else
                 s = Mathf.Cos(Mathf.Pow(counter, counterPower) * Mathf.PI * 2 + (timeOffset % 1) * Mathf.PI * 2);
 
             float lBound = -1f;
-            if (useNoise || useCustom)
+            if (useNoise)// || useCustom)
                 lBound = 0;
             float output = Mathf.Clamp(map(s, lBound, 1, _trough, _crest) * _multiply + _offset, _clampLow, _clampHigh);
             output = Mathf.Pow(output, output > 0 ? sinPower : 1);
