@@ -17,9 +17,9 @@
     },
     "license": "SEE LICENSE IN LICENSE",
     "files": [
-        "/Audio",
-        "/Editor",
-        "/Scripts",
-        "/LICENSE"
+        "Audio",
+        "Editor",
+        "Scripts",
+        "LICENSE"
     ]
 }
