@@ -1,0 +1,25 @@
+{
+    "name": "com.on.synth",
+    "version": "1.0.0",
+    "displayName": "Synth",
+    "description": "A synthesizer package for Unity",
+    "unity": "2019.1",
+    "dependencies": {},
+    "keywords": [
+        "audio",
+        "synthesizer",
+        "music"
+    ],
+    "author": {
+        "name": "David Lobser",
+        "email": "david@objectnormal.com",
+        "url": "https://objectnormal.com"
+    },
+    "license": "SEE LICENSE IN LICENSE",
+    "files": [
+        "/Audio",
+        "/Editor",
+        "/Scripts",
+        "/LICENSE"
+    ]
+}
