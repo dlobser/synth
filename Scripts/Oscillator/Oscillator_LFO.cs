@@ -57,6 +57,9 @@ namespace ON.synth
 
         void Start()
         {
+            if(float.IsNaN(lazyValue)){
+                lazyValue = 0;
+            }
             if(curve==null){
                 curve = new AnimationCurve();
                 curve.AddKey(new Keyframe(0,0));
@@ -266,6 +269,9 @@ namespace ON.synth
             output = Mathf.Pow(output, output > 0 ? sinPower : 1);
 
             lazyValue = Mathf.Lerp(lazyValue, output, lazyLerpSpeed * Time.deltaTime);
+            if(float.IsNaN(lazyValue)){
+                lazyValue = 0;
+            }
             return lazyValue;
         }
 
